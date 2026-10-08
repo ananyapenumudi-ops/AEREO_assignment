@@ -1,5 +1,7 @@
 # Bulk Certificate Generator
 
+![tests](https://github.com/ananyapenumudi-ops/AEREO_assignment/actions/workflows/tests.yml/badge.svg)
+
 A FastAPI backend that takes a list of recipients (as JSON or a CSV file), generates a PDF certificate for each one in the background, and lets you track progress and download the results, either one by one or as a ZIP.
 
 Stack: **Python 3.11+, FastAPI, SQLAlchemy 2, SQLite (or Postgres), ReportLab, pytest**
@@ -64,7 +66,7 @@ Interactive docs are at http://127.0.0.1:8000/docs, where every endpoint can be 
 pytest
 ```
 
-The tests use a fresh temporary database and output folder each time, and run jobs inline so they don't have to wait on a background thread.
+They also run on GitHub Actions for every push (Python 3.11 and 3.13). The tests use a fresh temporary database and output folder each time, and run jobs inline so they don't have to wait on a background thread.
 
 ## Using the API
 
