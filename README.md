@@ -148,7 +148,7 @@ If some certificates `failed` during generation, `POST /jobs/{id}/retry` re-runs
 
 | | |
 |---|---|
-| `GET /jobs/{id}/certificates` | every row of the job; filter with `?status=generated` (or `failed`, `invalid`, `pending`) |
+| `GET /jobs/{id}/certificates` | rows of the job, 100 per page by default (`?limit=` up to 1000, `?offset=`); filter with `?status=generated` (or `failed`, `invalid`, `pending`). The total count is in the `X-Total-Count` header |
 | `GET /jobs/{id}/download` | ZIP of all generated PDFs (409 while the job is still running) |
 | `POST /jobs/{id}/retry` | regenerate only the `failed` certificates |
 | `GET /certificates/{id}` | one certificate's details |
@@ -181,6 +181,5 @@ Names and emails are whitespace-normalised first, and duplicate emails are compa
 
 - Move generation to Celery/RQ and the PDFs to object storage (S3) for multi-server deployments
 - Build the ZIP once when a job finishes instead of in memory on every download (fine for a few thousand small PDFs, but it doesn't scale forever)
-- Pagination on `GET /jobs/{id}/certificates` for very large jobs
 - Authentication, so jobs belong to an organisation
 - Email each recipient their certificate

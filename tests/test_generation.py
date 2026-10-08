@@ -162,3 +162,13 @@ def test_verify_certificate(client):
     assert res.json()["course_name"] == "Drone Survey & Mapping Basics"
 
     assert client.get("/verify/NOTAREALCODE").status_code == 404
+
+
+def test_certificate_list_is_paginated(client):
+    job_id = client.post("/jobs", json=make_payload()).json()["id"]
+
+    res = client.get(f"/jobs/{job_id}/certificates?limit=2&offset=1")
+    assert res.headers["x-total-count"] == "3"
+    assert [c["row_number"] for c in res.json()] == [2, 3]
+
+    assert client.get(f"/jobs/{job_id}/certificates?limit=0").status_code == 422

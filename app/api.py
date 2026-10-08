@@ -4,9 +4,9 @@ import zipfile
 from datetime import date
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app import jobs
@@ -128,9 +128,13 @@ def retry_job(job_id: str, db: Session = Depends(get_db)):
 @router.get("/jobs/{job_id}/certificates", response_model=list[CertificateOut], tags=["certificates"])
 def list_certificates(
     job_id: str,
+    response: Response,
     status: str | None = Query(None, description="pending, generated, failed or invalid"),
+    limit: int = Query(100, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
 ):
+    """Certificates in row order. The total matching count is in the X-Total-Count header."""
     _get_job(db, job_id)
     if status and status not in CertStatus.ALL:
         raise HTTPException(422, f"status must be one of: {', '.join(CertStatus.ALL)}")
@@ -138,7 +142,10 @@ def list_certificates(
     query = select(Certificate).where(Certificate.job_id == job_id)
     if status:
         query = query.where(Certificate.status == status)
-    return [_cert_out(c) for c in db.scalars(query.order_by(Certificate.row_number))]
+
+    response.headers["X-Total-Count"] = str(db.scalar(select(func.count()).select_from(query.subquery())))
+    page = query.order_by(Certificate.row_number).limit(limit).offset(offset)
+    return [_cert_out(c) for c in db.scalars(page)]
 
 
 @router.get("/jobs/{job_id}/download", tags=["certificates"])
