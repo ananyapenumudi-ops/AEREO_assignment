@@ -1,0 +1,10 @@
+{
+  "course_name": "DGCA Small Category Drone Pilot Training",
+  "issued_on": "2026-10-04",
+  "issued_by": "Skyline Drone Academy",
+  "recipients": [
+    {"name": "Ananya Penumudi", "email": "ananya@example.com"},
+    {"name": "Rahul Varma", "email": "rahul@example.com"},
+    {"name": "Sneha Reddy", "email": "sneha-at-example.com"}
+  ]
+}
