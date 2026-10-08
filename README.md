@@ -33,7 +33,7 @@ pip install -r requirements.txt
 
 Nothing else is needed. By default it uses a SQLite file (`certificates.db`) and writes PDFs to `generated/`, both created on first start.
 
-Optional environment variables (see `.env.example`):
+Optional settings, read from environment variables (`.env.example` lists them with their defaults; the app does not load a `.env` file by itself):
 
 | Variable | Default | |
 |---|---|---|
