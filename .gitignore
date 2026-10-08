@@ -6,4 +6,3 @@ __pycache__/
 .env
 certificates.db*
 generated/
-.claude/
