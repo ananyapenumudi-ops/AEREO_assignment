@@ -151,3 +151,14 @@ def test_unfinished_jobs_resume_on_startup(client, paused_worker, monkeypatch):
     monkeypatch.setattr(settings, "run_jobs_inline", True)
     assert resume_unfinished_jobs() == 1
     assert client.get(f"/jobs/{job_id}").json()["status"] == "completed"
+
+
+def test_csv_over_size_limit_is_413(client, monkeypatch):
+    monkeypatch.setattr(settings, "max_upload_bytes", 100)
+    csv_data = "name,email\n" + "Ananya Penumudi,ananya@example.com\n" * 10
+    res = client.post(
+        "/jobs/upload",
+        files={"file": ("big.csv", csv_data, "text/csv")},
+        data={"course_name": "Drone Basics"},
+    )
+    assert res.status_code == 413

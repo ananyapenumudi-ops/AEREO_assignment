@@ -51,8 +51,11 @@ async def create_job_from_csv(
     """Submit recipients as a CSV file."""
     if not course_name.strip():
         raise HTTPException(422, "course_name cannot be blank")
+    content = await file.read(settings.max_upload_bytes + 1)
+    if len(content) > settings.max_upload_bytes:
+        raise HTTPException(413, f"CSV is larger than {settings.max_upload_bytes // 1024} KB")
     try:
-        recipients = parse_csv(await file.read())
+        recipients = parse_csv(content)
     except ValueError as exc:
         raise HTTPException(400, str(exc))
     if len(recipients) > settings.max_recipients_per_job:

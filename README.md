@@ -40,6 +40,7 @@ Optional settings, read from environment variables (`.env.example` lists them wi
 | `DATABASE_URL` | `sqlite:///./certificates.db` | any SQLAlchemy URL |
 | `OUTPUT_DIR` | `./generated` | where PDFs are stored |
 | `MAX_RECIPIENTS_PER_JOB` | `5000` | |
+| `MAX_UPLOAD_BYTES` | `2097152` (2 MB) | largest CSV accepted by `/jobs/upload` |
 | `WORKER_THREADS` | `4` | how many jobs can run at the same time |
 
 To use Postgres instead:
@@ -90,7 +91,7 @@ curl -X POST http://127.0.0.1:8000/jobs \
 }
 ```
 
-Or CSV (needs `name` and `email` columns, other columns are ignored):
+Or CSV (needs `name` and `email` columns, other columns are ignored, max 2 MB):
 
 ```bash
 curl -X POST http://127.0.0.1:8000/jobs/upload \
