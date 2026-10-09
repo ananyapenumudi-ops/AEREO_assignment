@@ -66,7 +66,7 @@ Interactive docs are at http://127.0.0.1:8000/docs, where every endpoint can be 
 pytest
 ```
 
-They also run on GitHub Actions for every push (Python 3.11 and 3.13). The tests use a fresh temporary database and output folder each time, and run jobs inline so they don't have to wait on a background thread.
+They also run on GitHub Actions for every push, on SQLite (Python 3.11 and 3.13) and on a real Postgres 16 database. To run them against your own Postgres locally, set `TEST_DATABASE_URL`. Note that it drops and recreates the tables. The tests use a fresh temporary database and output folder each time, and run jobs inline so they don't have to wait on a background thread.
 
 ## Using the API
 
@@ -177,7 +177,7 @@ Names and emails are whitespace-normalised first, and duplicate emails are compa
 
 **Files on disk, metadata in the DB.** PDFs are saved under `generated/<job_id>/<certificate_id>.pdf`, and the DB stores the path. Using ids instead of names in file paths avoids collisions and any path problems from user input. Readable names like `0001_Ananya_Penumudi.pdf` are only used when downloading.
 
-**SQLite by default.** It means zero setup for whoever runs this. It runs in WAL mode so the API can read progress while a worker is writing. Switching to Postgres only takes setting `DATABASE_URL`, with no code changes. Tables are created with `create_all` on startup. In a real deployment I'd use Alembic migrations instead.
+**SQLite by default.** It means zero setup for whoever runs this. It runs in WAL mode so the API can read progress while a worker is writing. Switching to Postgres only takes setting `DATABASE_URL`, with no code changes, and CI runs the full test suite against Postgres to prove it. Running on Postgres caught one real difference: SQLite ignores column lengths, so a very long name or email worked there but crashed Postgres. Over-long values are now rejected by validation, and stored values are cut to fit their columns. Tables are created with `create_all` on startup. In a real deployment I'd use Alembic migrations instead.
 
 ## Things I'd add next
 

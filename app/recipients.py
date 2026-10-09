@@ -3,6 +3,7 @@ import io
 import re
 
 MAX_NAME_LENGTH = 80  # longer names don't fit on the certificate
+MAX_EMAIL_LENGTH = 254
 
 # basic shape check only: something@domain.tld
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[A-Za-z]{2,}$")
@@ -23,6 +24,8 @@ def check_recipient(name: str, email: str, seen_emails: set[str]) -> str | None:
 
     if not email:
         return "email is required"
+    if len(email) > MAX_EMAIL_LENGTH:
+        return f"email is longer than {MAX_EMAIL_LENGTH} characters"
     if not EMAIL_RE.match(email):
         return f"'{email}' is not a valid email address"
 

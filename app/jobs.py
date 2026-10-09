@@ -8,7 +8,15 @@ from sqlalchemy.orm import Session
 from app import generator
 from app.config import settings
 from app.db import SessionLocal
-from app.models import Certificate, CertStatus, Job, JobStatus, utcnow
+from app.models import (
+    EMAIL_COLUMN_LENGTH,
+    NAME_COLUMN_LENGTH,
+    Certificate,
+    CertStatus,
+    Job,
+    JobStatus,
+    utcnow,
+)
 from app.recipients import check_recipient, clean
 
 log = logging.getLogger(__name__)
@@ -40,8 +48,8 @@ def create_job(
         job.certificates.append(
             Certificate(
                 row_number=row_number,
-                recipient_name=name or None,
-                recipient_email=email or None,
+                recipient_name=name[:NAME_COLUMN_LENGTH] or None,
+                recipient_email=email[:EMAIL_COLUMN_LENGTH] or None,
                 status=CertStatus.INVALID if error else CertStatus.PENDING,
                 error=error,
             )

@@ -162,3 +162,21 @@ def test_csv_over_size_limit_is_413(client, monkeypatch):
         data={"course_name": "Drone Basics"},
     )
     assert res.status_code == 413
+
+
+def test_oversized_values_are_rejected_without_breaking_the_job(client):
+    payload = make_payload(
+        {"name": "A" * 300, "email": "long.name@example.com"},
+        {"name": "Long Email", "email": "x" * 400 + "@example.com"},
+        {"name": "Ananya Penumudi", "email": "ananya@example.com"},
+    )
+    created = client.post("/jobs", json=payload)
+    assert created.status_code == 202
+    assert created.json()["invalid"] == 2
+
+    job = client.get(created.json()["status_url"]).json()
+    assert job["progress"]["generated"] == 1
+    assert [p["error"] for p in job["problems"]] == [
+        "name is longer than 80 characters",
+        "email is longer than 254 characters",
+    ]

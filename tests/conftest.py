@@ -1,3 +1,5 @@
+import os
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -5,10 +7,17 @@ from app import db
 from app.config import settings
 from app.main import app
 
+# set in CI to run the same tests against Postgres
+TEST_DATABASE_URL = os.getenv("TEST_DATABASE_URL")
+
 
 @pytest.fixture
 def client(tmp_path, monkeypatch):
-    db.use_database(f"sqlite:///{tmp_path / 'test.db'}")
+    if TEST_DATABASE_URL:
+        db.use_database(TEST_DATABASE_URL)
+        db.Base.metadata.drop_all(db.engine)
+    else:
+        db.use_database(f"sqlite:///{tmp_path / 'test.db'}")
     monkeypatch.setattr(settings, "output_dir", tmp_path / "generated")
     monkeypatch.setattr(settings, "run_jobs_inline", True)
 

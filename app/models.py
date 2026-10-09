@@ -20,6 +20,11 @@ def _verification_code() -> str:
     return secrets.token_hex(5).upper()
 
 
+# rejected rows are still stored, so these are cut to fit
+NAME_COLUMN_LENGTH = 200
+EMAIL_COLUMN_LENGTH = 320
+
+
 class JobStatus:
     PENDING = "pending"
     PROCESSING = "processing"
@@ -64,8 +69,8 @@ class Certificate(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=_uuid)
     job_id: Mapped[str] = mapped_column(ForeignKey("jobs.id"), index=True)
     row_number: Mapped[int] = mapped_column(Integer)
-    recipient_name: Mapped[str | None] = mapped_column(String(200))
-    recipient_email: Mapped[str | None] = mapped_column(String(320))
+    recipient_name: Mapped[str | None] = mapped_column(String(NAME_COLUMN_LENGTH))
+    recipient_email: Mapped[str | None] = mapped_column(String(EMAIL_COLUMN_LENGTH))
     status: Mapped[str] = mapped_column(String(32), default=CertStatus.PENDING, index=True)
     error: Mapped[str | None] = mapped_column(Text)
     file_path: Mapped[str | None] = mapped_column(String(500))
